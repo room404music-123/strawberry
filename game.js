@@ -69,8 +69,8 @@ $("modeTraining").onclick=()=>{s.idolMode="training";s.iTrainAt=now();s.iIdeaAt=
 $("modeLive").onclick=()=>{if(!s.comboFeature)return;s.idolMode="live";s.liveAt=now();log("アイドルのライブ活動が始まった。");save();render();say("ライブモード開始！")};
 [["policyV","ボーカル"],["policyD","ダンス"],["policyE","表現"]].forEach(([id,v])=>$(id).onclick=()=>{s.lessonPolicy=v;s.iIdeaAt=now();log("レッスン方針を「"+v+"」に設定。");save();render();say(v+"関連のアイデアを探すよ。")});
 $("combineBtn").onclick=()=>{if(!comboUnlocked())return;let c=cPool.find(x=>x[0]===$("comboC").value),i=iPool.find(x=>x[0]===$("comboI").value);if(!c||!i)return;if(s.combos.some(x=>x.c===c[1]&&x.i===i[1])){say("この組み合わせは発見済みだよ。");return}let names=["ふたりの放課後","重なるメロディ","まだ見ぬステージ","雨音のシンフォニー","夢の続きを"];let item={name:rand(names)+" #"+(s.combos.length+1),c:c[1],i:i[1]};s.combos.push(item);log("新しい組み合わせを発見：「"+item.name+"」");save();render();say("新しい組み合わせを発見！")};
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>viewTo(b.dataset.view));$("settings").onclick=()=>{$("editC").value=s.cName;$("editI").value=s.iName;$("settingsModal").classList.remove("hidden")};$("closeSettings").onclick=()=>$("settingsModal").classList.add("hidden");$("saveNames").onclick=()=>{s.cName=$("editC").value.trim()||"作曲家";s.iName=$("editI").value.trim()||"アイドル";$("settingsModal").classList.add("hidden");save();render();say("名前を保存したよ。")};$("begin").onclick=()=>{let c=$("composerName").value.trim(),i=$("idolName").value.trim();if(!c||!i){say("二人の名前を入力してね。");return}s.cName=c;s.iName=i;log(c+"と"+i+"の音楽活動が始まった。");$("names").classList.add("hidden");save();render();say("ふたりの活動が始まった！")};$("reset").onclick=()=>{if(!confirm("セーブデータをリセットする？"))return;localStorage.removeItem(KEY);s=fresh();$("settingsModal").classList.add("hidden");$("names").classList.remove("hidden");render()};
-if(!s.cName||!s.iName){$("composerName").value=s.cName;$("idolName").value=s.iName}else $("names").classList.add("hidden");
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>viewTo(b.dataset.view));$("settings").onclick=()=>{$("editC").value=s.cName;$("editI").value=s.iName;$("settingsModal").classList.remove("hidden")};$("closeSettings").onclick=()=>$("settingsModal").classList.add("hidden");$("saveNames").onclick=()=>{s.cName=$("editC").value.trim()||"作曲家";s.iName=$("editI").value.trim()||"アイドル";$("settingsModal").classList.add("hidden");save();render();say("名前を保存したよ。")};$("begin").onclick=()=>{let c=$("composerName").value.trim(),i=$("idolName").value.trim();if(!c||!i){say("二人の名前を入力してね。");return}s.cName=c;s.iName=i;log(c+"と"+i+"の音楽活動が始まった。");$("names").classList.add("hidden");$("returnModal").classList.add("hidden");localStorage.removeItem(KEY+"-return");localStorage.removeItem(KEY+"-base");save();render();say("ふたりの活動が始まった！")};$("reset").onclick=()=>{if(!confirm("セーブデータをリセットする？"))return;localStorage.removeItem(KEY);s=fresh();$("settingsModal").classList.add("hidden");$("names").classList.remove("hidden");render()};
+if(!s.cName||!s.iName){$("composerName").value=s.cName;$("idolName").value=s.iName;$("names").classList.remove("hidden");$("returnModal").classList.add("hidden");localStorage.removeItem(KEY+"-return");localStorage.removeItem(KEY+"-base")}else $("names").classList.add("hidden");
 
 const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
 const readReturnBase=()=>{try{return JSON.parse(localStorage.getItem(KEY+"-base")||"null")}catch{return null}};
@@ -107,8 +107,7 @@ $("closeReturn").onclick=()=>{
  s.lastSeen=now();save();
 };
 const pendingReturn=(()=>{try{return JSON.parse(localStorage.getItem(KEY+"-return")||"null")}catch{return null}})();
-if(pendingReturn)displayReturnSummary(pendingReturn);
-else showReturnSummary(previous,away);
+if(s.cName&&s.iName){if(pendingReturn)displayReturnSummary(pendingReturn);else showReturnSummary(previous,away);}
 let hiddenSnapshot=null,hiddenAt=0;
 setInterval(tick,5000);
 document.addEventListener("visibilitychange",()=>{
