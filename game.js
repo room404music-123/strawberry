@@ -46,7 +46,7 @@ function ownSongRank(song,t=now()){let list=s.songs.filter(x=>x.released).sort((
 function marketSongRank(song,t=now()){let statsTotal=totalStat("vocal")+totalStat("dance")+totalStat("express"),score=chartScore(song,t),base=song.chartBase||Math.max(40,(song.quality||30)*7);if(Math.min(totalStat("vocal"),totalStat("dance"),totalStat("express"))<10||statsTotal<45||chartDay(song,t)>=35||score<=0)return null;let fanPower=Math.log10((s.fans||0)+1)*4,repPower=Math.min(30,s.reputation||0)*0.4,statPower=statsTotal*0.55,qualityPower=(song.quality||30)*0.08,releasePower=Math.min(20,s.releases||0)*0.5,power=statPower+fanPower+repPower+qualityPower+releasePower,momentum=0.75+0.25*(score/base),qualityFactor=0.9+(song.quality||30)/500;let rank=Math.round(100000/(1+power*0.35*momentum*qualityFactor));return Math.max(1,rank)}
 function tick(){let t=now(),days=Math.min(35,Math.floor((t-s.incomeAt)/GAME_DAY_MS));if(days>0){let songIncome=0;for(let step=1;step<=days;step++){let at=s.incomeAt+step*GAME_DAY_MS;songIncome+=s.songs.filter(x=>x.released).reduce((a,x)=>{let gain=Math.max(0,Math.round(chartScore(x,at)/35));x.chartEarned=(x.chartEarned||0)+gain;return a+gain},0)}s.money+=songIncome;s.earned+=songIncome;s.incomeAt+=days*GAME_DAY_MS;if(t-s.incomeAt>=GAME_DAY_MS)s.incomeAt=t}
 let cN=Math.floor((t-s.cGatherAt)/60000);if(cN>0){for(let n=0;n<Math.min(cN,100);n++)addCollection("c");s.cGatherAt+=cN*60000}
-if(s.idolMode==="training"){let trainInterval=s.iOwned.includes("room")?48000:60000,trainN=Math.floor((t-s.iTrainAt)/trainInterval);if(trainN>0){let k=s.lessonPolicy==="ボーカル"?"vocal":s.lessonPolicy==="ダンス"?"dance":"express",gain=1+(s.iOwned.includes("speaker")?1:0);if(k==="vocal"&&s.iOwned.includes("mic"))gain++;if(k==="dance"&&s.iOwned.includes("mirror"))gain++;addStatXP(k,trainN*gain);s.iTrainAt+=trainN*trainInterval;if(trainN>=1)log(s.lessonPolicy+"のレッスンを続けて、ステータスが成長した。")}}
+if(s.idolMode==="training"){let trainInterval=s.iOwned.includes("room")?48000:60000,trainN=Math.floor((t-s.iTrainAt)/trainInterval);if(trainN>0){let k=s.lessonPolicy==="ボーカル"?"vocal":s.lessonPolicy==="ダンス"?"dance":"express",gain=1+(s.iOwned.includes("speaker")?1:0);if(k==="vocal"&&s.iOwned.includes("mic"))gain++;if(k==="dance"&&s.iOwned.includes("mirror"))gain++;addStatXP(k,trainN*gain);s.iTrainAt+=trainN*trainInterval;if(trainN>=1)log(s.lessonPolicy+"のレッスンでステータスが+"+(trainN*gain)+" pt成長した。")}}
 let ideaN=Math.floor((t-s.iIdeaAt)/96000);if(ideaN>0&&s.idolMode==="training"){for(let n=0;n<Math.min(ideaN,100);n++)addCollection("i");s.iIdeaAt+=ideaN*96000}
 if(s.idolMode==="live"){let liveN=Math.floor((t-s.liveAt)/36000);if(liveN>0){let f=liveN*(4+Math.floor((totalStat("vocal")+totalStat("dance")+totalStat("express"))/18));let cash=liveN*(35+Math.floor(totalStat("vocal")+totalStat("dance")+totalStat("express")));s.fans+=f;s.money+=cash;s.earned+=cash;s.liveIncome+=cash;s.reputation+=liveN;s.liveAt+=liveN*36000;if(liveN>0)log("ライブ活動で "+f+" 人のファンと "+yen(cash)+" を獲得。")}}
 unlockCheck();save();render()}
@@ -131,6 +131,7 @@ setInterval(tick,5000);
 document.addEventListener("visibilitychange",()=>{
  if(document.hidden){
   if(!$("returnModal").classList.contains("hidden"))return;
+  tick();
   hiddenSnapshot=snapshot();hiddenAt=now();
   localStorage.setItem(KEY+"-base",JSON.stringify(hiddenSnapshot));
   s.lastSeen=hiddenAt;save();
@@ -141,4 +142,9 @@ document.addEventListener("visibilitychange",()=>{
   hiddenSnapshot=null;hiddenAt=0;s.lastSeen=now();save();
  }
 });
+// バックグラウンド中にブラウザがタイマーを停止・大幅に間引きしても、
+// タブ復帰やページ復元時に経過時間をまとめて精算する。
+const catchUpAfterResume=()=>{if(document.hidden)return;tick();s.lastSeen=now();save()};
+window.addEventListener("focus",catchUpAfterResume);
+window.addEventListener("pageshow",catchUpAfterResume);
 })();
