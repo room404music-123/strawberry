@@ -53,8 +53,10 @@ $("combineBtn").onclick=()=>{if(!comboUnlocked())return;let c=cPool.find(x=>x[0]
 document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>viewTo(b.dataset.view));$("settings").onclick=()=>{$("editC").value=s.cName;$("editI").value=s.iName;$("settingsModal").classList.remove("hidden")};$("closeSettings").onclick=()=>$("settingsModal").classList.add("hidden");$("saveNames").onclick=()=>{s.cName=$("editC").value.trim()||"作曲家";s.iName=$("editI").value.trim()||"アイドル";$("settingsModal").classList.add("hidden");save();render();say("名前を保存したよ。")};$("begin").onclick=()=>{let c=$("composerName").value.trim(),i=$("idolName").value.trim();if(!c||!i){say("二人の名前を入力してね。");return}s.cName=c;s.iName=i;log(c+"と"+i+"の音楽活動が始まった。");$("names").classList.add("hidden");save();render();say("ふたりの活動が始まった！")};$("reset").onclick=()=>{if(!confirm("セーブデータをリセットする？"))return;localStorage.removeItem(KEY);s=fresh();$("settingsModal").classList.add("hidden");$("names").classList.remove("hidden");render()};
 if(!s.cName||!s.iName){$("composerName").value=s.cName;$("idolName").value=s.iName}else $("names").classList.add("hidden");
 
-const previous={lastSeen:s.lastSeen||now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}};
-const away=Math.max(0,now()-previous.lastSeen);
+const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
+const readReturnBase=()=>{try{return JSON.parse(localStorage.getItem(KEY+"-base")||"null")}catch{return null}};
+const previous=readReturnBase()||{lastSeen:s.lastSeen||now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}};
+const away=Math.max(0,now()-(previous.lastSeen||now()));
 tick();
 function showReturnSummary(previous,away){
  if(away<60000)return;
@@ -82,17 +84,21 @@ function displayReturnSummary(notice){
 $("closeReturn").onclick=()=>{
  $("returnModal").classList.add("hidden");
  localStorage.removeItem(KEY+"-return");
+ localStorage.removeItem(KEY+"-base");
  s.lastSeen=now();save();
 };
 const pendingReturn=(()=>{try{return JSON.parse(localStorage.getItem(KEY+"-return")||"null")}catch{return null}})();
 if(pendingReturn)displayReturnSummary(pendingReturn);
 else showReturnSummary(previous,away);
-const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
 let hiddenSnapshot=null,hiddenAt=0;
 setInterval(tick,5000);
 document.addEventListener("visibilitychange",()=>{
- if(document.hidden){hiddenSnapshot=snapshot();hiddenAt=now();s.lastSeen=hiddenAt;save()}
- else{
+ if(document.hidden){
+  if(!$("returnModal").classList.contains("hidden"))return;
+  hiddenSnapshot=snapshot();hiddenAt=now();
+  localStorage.setItem(KEY+"-base",JSON.stringify(hiddenSnapshot));
+  s.lastSeen=hiddenAt;save();
+ }else{
   const elapsed=hiddenAt?now()-hiddenAt:0;
   tick();
   if(hiddenSnapshot&&elapsed>=60000)showReturnSummary(hiddenSnapshot,elapsed);
