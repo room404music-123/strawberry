@@ -59,7 +59,7 @@ tick();
 function showReturnSummary(previous,away){
  if(away<60000)return;
  const rows=[];
- const moneyGain=s.money-previous.money,fanGain=s.fans-previous.fans,repGain=s.reputation-previous.reputation,earnedGain=s.earned-previous.earned;
+ const moneyGain=s.money-previous.money,fanGain=s.fans-previous.fans,repGain=s.reputation-previous.reputation;
  if(moneyGain>0)rows.push(["共同資金","+"+yen(moneyGain)]);
  if(fanGain>0)rows.push(["ファン","+"+fanGain.toLocaleString("ja-JP")+" 人"]);
  if(repGain>0)rows.push(["知名度","+"+repGain]);
@@ -70,17 +70,26 @@ function showReturnSummary(previous,away){
  if(s.iOwned.length>previous.iOwned)rows.push(["レッスンアイデア","+"+(s.iOwned.length-previous.iOwned)+" 種類"]);
  if(s.made>previous.made)rows.push(["完成した楽曲","+"+(s.made-previous.made)+" 曲"]);
  const hours=Math.floor(away/3600000),minutes=Math.floor(away%3600000/60000);
- $("returnDuration").textContent=hours?hours+"時間"+minutes+"分":Math.max(1,minutes)+"分";
- $("returnResults").innerHTML=rows.length?rows.map(([label,value])=>'<div class="return-result"><span>'+label+'</span><b>'+value+'</b></div>').join(""):'<p class="return-empty">ふたりはそれぞれの場所で、次の活動に向けて準備していたみたい。</p>';
+ const notice={duration:hours?hours+"時間"+minutes+"分":Math.max(1,minutes)+"分",rows};
+ localStorage.setItem(KEY+"-return",JSON.stringify(notice));
+ displayReturnSummary(notice);
+}
+function displayReturnSummary(notice){
+ $("returnDuration").textContent=notice.duration;
+ $("returnResults").innerHTML=notice.rows.length?notice.rows.map(([label,value])=>'<div class="return-result"><span>'+label+'</span><b>'+value+'</b></div>').join(""):'<p class="return-empty">ふたりはそれぞれの場所で、次の活動に向けて準備していたみたい。</p>';
  $("returnModal").classList.remove("hidden");
 }
-$("closeReturn").onclick=()=>$("returnModal").classList.add("hidden");
-showReturnSummary(previous,away);
-s.lastSeen=now();save();
+$("closeReturn").onclick=()=>{
+ $("returnModal").classList.add("hidden");
+ localStorage.removeItem(KEY+"-return");
+ s.lastSeen=now();save();
+};
+const pendingReturn=(()=>{try{return JSON.parse(localStorage.getItem(KEY+"-return")||"null")}catch{return null}})();
+if(pendingReturn)displayReturnSummary(pendingReturn);
+else showReturnSummary(previous,away);
 const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
 let hiddenSnapshot=null,hiddenAt=0;
 setInterval(tick,5000);
-window.addEventListener("beforeunload",()=>{s.lastSeen=now();save()});
 document.addEventListener("visibilitychange",()=>{
  if(document.hidden){hiddenSnapshot=snapshot();hiddenAt=now();s.lastSeen=hiddenAt;save()}
  else{
