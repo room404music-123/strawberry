@@ -65,7 +65,7 @@ function renderChart(){
  if(!song){$("songChart").innerHTML='<p class="muted">楽曲をリリースするとチャートが表示されます。</p>';return}
  s.chartSelected=song.id;
  let day=chartDay(song),market=marketSongRank(song),own=ownSongRank(song),score=chartScore(song);
- let points=Array.from({length:36},(_,d)=>{let life=Math.max(1,Math.min(35,song.chartLifeDays||chartLifeDays()));return d>=life?0:Math.round((song.chartBase||song.quality*7)*Math.max(0,1-d/life))});
+ let points=Array.from({length:36},(_,d)=>{let life=35;return d>=life?0:Math.round((song.chartBase||song.quality*7)*Math.max(0,1-d/life))});
  let max=Math.max(...points,1);
  let bars=points.map((v,d)=>'<div class="chart-bar-wrap"><div class="chart-bar" style="height:'+Math.max(v?2:0,v/max*100)+'%"></div><small>'+d+'</small></div>').join("");
  let marketText=market===null?"圏外":"#"+market.toLocaleString("ja-JP");
