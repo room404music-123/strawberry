@@ -1,5 +1,19 @@
 (()=> {
 const KEY="one-more-hit-v1",$=id=>document.getElementById(id),now=()=>Date.now(),yen=n=>"¥"+Math.floor(n).toLocaleString("ja-JP");
+const beginButton=document.getElementById("begin");
+if(beginButton)beginButton.addEventListener("click",()=>{
+ try{
+  const composerInput=document.getElementById("composerName"),idolInput=document.getElementById("idolName");
+  const c=composerInput.value.trim(),i=idolInput.value.trim();
+  if(!c||!i){alert("二人の名前を入力してね。");return}
+  s.cName=c;s.iName=i;
+  log(c+"と"+i+"の音楽活動が始まった。");
+  document.getElementById("names").classList.add("hidden");
+  document.getElementById("returnModal").classList.add("hidden");
+  localStorage.removeItem(KEY+"-return");localStorage.removeItem(KEY+"-base");
+  save();render();say("ふたりの活動が始まった！");
+ }catch(error){console.error("開始処理エラー",error);alert("開始処理でエラーが発生しました。ページを再読み込みして、もう一度試してください。\n"+error.message)}
+});
 const cPool=[["rain","雨上がりの街","景色",["ポップ","シティポップ","アンビエント"],"雨音のリズムを取り入れやすくなる。"],["waves","遠くの波音","音",["ロック","アンビエント","アコースティック"],"うねるような音の重なりを作りやすくなる。"],["cafe","古い喫茶店","場所",["ジャズ","シティポップ","バラード"],"落ち着いたコードや都会的な雰囲気を加える。"],["whistle","誰かの口笛","音",["ポップ","アコースティック","ミュージカル"],"耳に残る親しみやすい旋律を生みやすくなる。"],["stars","星の見える帰り道","景色",["アンビエント","クラシック","バラード"],"広がりのある幻想的な音作りに向く。"],["train","終電前のホーム","場所",["シティポップ","エレクトロ","ロック"],"疾走感や夜の街らしい音作りに向く。"],["wind","季節の変わり目の風","感覚",["アコースティック","アンビエント","バラード"],"空気感のある柔らかなアレンジを作りやすい。"],["window","知らない部屋の灯り","景色",["バラード","アンビエント","シティポップ"],"静かな情景を描く曲のクオリティを高める。"],["footsteps","並んだ足音","音",["ダンス","ロック","エレクトロ"],"ビートやリズムの印象を強める。"],["letters","書きかけの手紙","記憶",["バラード","ミュージカル","ポップ"],"物語性のあるメロディを作りやすくなる。"],["morning","休日の朝の光","景色",["ポップ","アコースティック","シティポップ"],"明るく軽やかな曲のクオリティを高める。"],["rainbow","水たまりに映る空","景色",["ポップ","ミュージカル","エレクトロ"],"華やかで印象的な展開を作りやすくなる。"]];
 const iPool=[["breath","息を吸うタイミング","歌",["ポップ","バラード","ミュージカル"],"歌い出しやフレーズの安定感を高める。"],["turn","ターンの入り方","ダンス",["ダンス","エレクトロ","ロック"],"ダンス曲での動きのキレを高める。"],["smile","ふとした笑顔","表現",["ポップ","シティポップ","ミュージカル"],"明るい曲で観客への伝わりやすさを高める。"],["pause","音のない一瞬","演出",["バラード","クラシック","アンビエント"],"静かな曲で余白を印象的に見せる。"],["hands","指先の動き","ダンス",["ダンス","ポップ","ミュージカル"],"細かな振り付けの魅力を引き出す。"],["gaze","視線の届け方","表現",["ロック","バラード","シティポップ"],"視線で曲の世界観を伝えやすくなる。"],["harmony","声の重ね方","歌",["アコースティック","クラシック","バラード"],"ハーモニーの美しさを引き出す。"],["step","小さなステップ","ダンス",["ダンス","エレクトロ","シティポップ"],"リズムに合ったステップの印象を強める。"],["silence","静寂の使い方","演出",["アンビエント","クラシック","バラード"],"静かな展開の表現力を高める。"],["crescendo","盛り上げる呼吸","歌",["ロック","ミュージカル","ポップ"],"サビに向かう歌の盛り上がりを強める。"],["pose","最後のポーズ","表現",["ダンス","ミュージカル","エレクトロ"],"曲の締めくくりを印象的にする。"],["echo","余韻の残し方","演出",["アンビエント","アコースティック","シティポップ"],"曲の余韻を丁寧に届ける。"]];
 const genres=["ポップ","ロック","バラード","エレクトロ","ダンス","アコースティック"];
@@ -69,7 +83,7 @@ $("modeTraining").onclick=()=>{s.idolMode="training";s.iTrainAt=now();s.iIdeaAt=
 $("modeLive").onclick=()=>{if(!s.comboFeature)return;s.idolMode="live";s.liveAt=now();log("アイドルのライブ活動が始まった。");save();render();say("ライブモード開始！")};
 [["policyV","ボーカル"],["policyD","ダンス"],["policyE","表現"]].forEach(([id,v])=>$(id).onclick=()=>{s.lessonPolicy=v;s.iIdeaAt=now();log("レッスン方針を「"+v+"」に設定。");save();render();say(v+"関連のアイデアを探すよ。")});
 $("combineBtn").onclick=()=>{if(!comboUnlocked())return;let c=cPool.find(x=>x[0]===$("comboC").value),i=iPool.find(x=>x[0]===$("comboI").value);if(!c||!i)return;if(s.combos.some(x=>x.c===c[1]&&x.i===i[1])){say("この組み合わせは発見済みだよ。");return}let names=["ふたりの放課後","重なるメロディ","まだ見ぬステージ","雨音のシンフォニー","夢の続きを"];let item={name:rand(names)+" #"+(s.combos.length+1),c:c[1],i:i[1]};s.combos.push(item);log("新しい組み合わせを発見：「"+item.name+"」");save();render();say("新しい組み合わせを発見！")};
-document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>viewTo(b.dataset.view));$("settings").onclick=()=>{$("editC").value=s.cName;$("editI").value=s.iName;$("settingsModal").classList.remove("hidden")};$("closeSettings").onclick=()=>$("settingsModal").classList.add("hidden");$("saveNames").onclick=()=>{s.cName=$("editC").value.trim()||"作曲家";s.iName=$("editI").value.trim()||"アイドル";$("settingsModal").classList.add("hidden");save();render();say("名前を保存したよ。")};$("begin").onclick=()=>{let c=$("composerName").value.trim(),i=$("idolName").value.trim();if(!c||!i){say("二人の名前を入力してね。");return}s.cName=c;s.iName=i;log(c+"と"+i+"の音楽活動が始まった。");$("names").classList.add("hidden");$("returnModal").classList.add("hidden");localStorage.removeItem(KEY+"-return");localStorage.removeItem(KEY+"-base");save();render();say("ふたりの活動が始まった！")};$("reset").onclick=()=>{if(!confirm("セーブデータをリセットする？"))return;localStorage.removeItem(KEY);s=fresh();$("settingsModal").classList.add("hidden");$("names").classList.remove("hidden");render()};
+document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>viewTo(b.dataset.view));$("settings").onclick=()=>{$("editC").value=s.cName;$("editI").value=s.iName;$("settingsModal").classList.remove("hidden")};$("closeSettings").onclick=()=>$("settingsModal").classList.add("hidden");$("saveNames").onclick=()=>{s.cName=$("editC").value.trim()||"作曲家";s.iName=$("editI").value.trim()||"アイドル";$("settingsModal").classList.add("hidden");save();render();say("名前を保存したよ。")};$("reset").onclick=()=>{if(!confirm("セーブデータをリセットする？"))return;localStorage.removeItem(KEY);s=fresh();$("settingsModal").classList.add("hidden");$("names").classList.remove("hidden");render()};
 if(!s.cName||!s.iName){$("composerName").value=s.cName;$("idolName").value=s.iName;$("names").classList.remove("hidden");$("returnModal").classList.add("hidden");localStorage.removeItem(KEY+"-return");localStorage.removeItem(KEY+"-base")}else $("names").classList.add("hidden");
 
 const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
