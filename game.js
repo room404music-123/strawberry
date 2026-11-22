@@ -9,7 +9,7 @@ let s;try{s={...fresh(),...JSON.parse(localStorage.getItem(KEY)||"{}")};s.stats=
 let view="composer",toastTimer;
 const cItems=[{id:"meal",name:"食事環境を整える",desc:"食事の心配が減って作業効率アップ。",cost:5000,bonus:"作曲クールタイム -5%"},{id:"bed",name:"寝具を買い替える",desc:"ちゃんと休める環境を作る。",cost:8000,bonus:"作曲クールタイム -5%"},{id:"desk",name:"作業デスクを新調",desc:"長時間の制作も快適に。",cost:12000,bonus:"作曲クールタイム -8%"},{id:"pc",name:"制作PCを強化",desc:"重い制作作業もスムーズに。",cost:20000,bonus:"作曲クールタイム -12%"}];
 const iItems=[{id:"mic",name:"マイクを新調",desc:"声をきれいに届ける機材。",cost:7000,bonus:"ボーカル成長 +1"},{id:"mirror",name:"鏡と練習スペース",desc:"フォームを確認しながら練習。",cost:9000,bonus:"ダンス成長 +1"},{id:"speaker",name:"モニタースピーカー",desc:"音を聴き分ける環境。",cost:14000,bonus:"レッスン成長 +1"},{id:"room",name:"レッスン室を改装",desc:"集中できる専用の練習室。",cost:25000,bonus:"成長サイクル短縮"}];
-function save(){s.lastSeen=now();localStorage.setItem(KEY,JSON.stringify(s));$("saved").textContent="保存済み · "+new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
+function save(){localStorage.setItem(KEY,JSON.stringify(s));$("saved").textContent="保存済み · "+new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
 function log(m){s.logs.unshift({at:now(),m});s.logs=s.logs.slice(0,35)}
 function say(m){$("toast").textContent=m;$("toast").classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.remove("show"),2300)}
 function spend(n){if(s.money<n){say("資金が足りないみたい。リリースやライブで増やそう。");return false}s.money-=n;return true}
@@ -56,7 +56,7 @@ if(!s.cName||!s.iName){$("composerName").value=s.cName;$("idolName").value=s.iNa
 const previous={lastSeen:s.lastSeen||now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}};
 const away=Math.max(0,now()-previous.lastSeen);
 tick();
-function showReturnSummary(){
+function showReturnSummary(previous,away){
  if(away<60000)return;
  const rows=[];
  const moneyGain=s.money-previous.money,fanGain=s.fans-previous.fans,repGain=s.reputation-previous.reputation,earnedGain=s.earned-previous.earned;
@@ -75,6 +75,19 @@ function showReturnSummary(){
  $("returnModal").classList.remove("hidden");
 }
 $("closeReturn").onclick=()=>$("returnModal").classList.add("hidden");
-showReturnSummary();
-setInterval(tick,5000);window.addEventListener("beforeunload",save);document.addEventListener("visibilitychange",()=>{if(!document.hidden)tick()});
+showReturnSummary(previous,away);
+s.lastSeen=now();save();
+const snapshot=()=>({lastSeen:now(),money:s.money,fans:s.fans,reputation:s.reputation,liveIncome:s.liveIncome,earned:s.earned,made:s.made,cOwned:s.cOwned.length,iOwned:s.iOwned.length,stats:{...s.stats}});
+let hiddenSnapshot=null,hiddenAt=0;
+setInterval(tick,5000);
+window.addEventListener("beforeunload",()=>{s.lastSeen=now();save()});
+document.addEventListener("visibilitychange",()=>{
+ if(document.hidden){hiddenSnapshot=snapshot();hiddenAt=now();s.lastSeen=hiddenAt;save()}
+ else{
+  const elapsed=hiddenAt?now()-hiddenAt:0;
+  tick();
+  if(hiddenSnapshot&&elapsed>=60000)showReturnSummary(hiddenSnapshot,elapsed);
+  hiddenSnapshot=null;hiddenAt=0;s.lastSeen=now();save();
+ }
+});
 })();
