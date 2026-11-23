@@ -180,3 +180,5 @@
 .book-filter-tools{grid-template-columns:minmax(130px,1.5fr) minmax(90px,1fr) minmax(90px,1fr)}
 .filter-empty{padding:10px 4px;font-size:11px}
 @media(max-width:600px){.filter-tools,.book-filter-tools{grid-template-columns:1fr 1fr}.filter-tools input,.book-filter-tools input{grid-column:1/-1}}
+
+.library-search-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;width:100%;margin-bottom:10px}.library-search-row input{min-width:0;width:100%}.library-search-button{min-width:76px;padding:10px 16px}#officeLibraryPage .music-library-panel{max-width:100%}@media(max-width:520px){.library-search-row{grid-template-columns:minmax(0,1fr) 72px}.library-search-button{min-width:0;padding:9px 8px}}
