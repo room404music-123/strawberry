@@ -174,7 +174,7 @@ document.addEventListener("visibilitychange",()=>{
   localStorage.setItem(KEY+"-base",JSON.stringify(hiddenSnapshot));
   s.lastSeen=hiddenAt;save();
  }else{
-  if(bgmWasPlayingBeforeHide&&bgmEnabled)startBgm();
+  if(bgmEnabled)startBgm();
   bgmWasPlayingBeforeHide=false;
   const elapsed=hiddenAt?now()-hiddenAt:0;
   tick();
@@ -184,7 +184,7 @@ document.addEventListener("visibilitychange",()=>{
 });
 // バックグラウンド中にブラウザがタイマーを停止・大幅に間引きしても、
 // タブ復帰やページ復元時に経過時間をまとめて精算する。
-const catchUpAfterResume=()=>{if(document.hidden)return;tick();s.lastSeen=now();save()};
+const catchUpAfterResume=()=>{if(document.hidden)return;tick();s.lastSeen=now();save();if(bgmEnabled)startBgm()};
 window.addEventListener("focus",catchUpAfterResume);
 window.addEventListener("pageshow",catchUpAfterResume);
 window.addEventListener("pagehide",()=>{bgmWasPlayingBeforeHide=!!(bgmAudio&&!bgmAudio.paused);stopBgm()});
