@@ -73,3 +73,23 @@
 .stream-item button{flex:0 0 auto}
 .stream-state{font-size:9px;color:#7e9a88;white-space:nowrap}
 @media(max-width:600px){.stream-summary{grid-template-columns:1fr 1fr}.stream-summary>div:last-child{grid-column:span 2}.stream-item{align-items:flex-start;flex-direction:column}.stream-item button{width:100%}}
+
+/* Multi-platform streaming distribution */
+.stream-platforms{display:grid;gap:14px;margin-top:14px}
+.stream-platform{border:1px solid #e9e5e1;border-radius:12px;padding:13px;background:#fff}
+.stream-platform-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.stream-platform-head h4{margin:3px 0;font-size:14px}
+.stream-platform-head p{margin:4px 0 0;color:#999;font-size:9px;line-height:1.6}
+.stream-platform-stats,.stream-platform-totals{display:flex;flex-wrap:wrap;gap:7px 14px;margin-top:10px;font-size:9px;color:#888}
+.stream-platform-stats b,.stream-platform-totals b{color:#444}
+.stream-platform-totals{padding:9px;background:#f7f5f2;border-radius:8px}
+.stream-bulk-row{display:flex;align-items:center;gap:10px;margin-top:10px}
+.stream-song-main{min-width:0;flex:1}
+.stream-select{display:flex;align-items:center;gap:7px;font-size:10px}
+.stream-select input{width:14px;height:14px;accent-color:#806b8d}
+.stream-song-main small{display:block;line-height:1.6}
+.stream-albums{margin-top:12px}
+.stream-albums>b{font-size:10px}
+.stream-albums .stream-item{margin-top:7px}
+.stream-platform .stream-state{white-space:nowrap}
+@media(max-width:600px){.stream-platform{padding:10px}.stream-platform-head{flex-direction:column}.stream-platform-stats{display:grid;grid-template-columns:1fr 1fr}.stream-bulk-row{align-items:flex-start;flex-direction:column}.stream-bulk-row button{width:100%}}
