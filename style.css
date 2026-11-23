@@ -172,3 +172,11 @@
 .chart-detail-head .chart-modes{margin:0}
 .chart-detail-title{margin:8px 0 14px;font-size:17px;color:#51465a}
 @media(max-width:600px){.chart-detail-head{align-items:stretch;flex-direction:column}.chart-detail-head .chart-modes{display:flex}.chart-detail-head .chart-modes button{flex:1}.library-song{padding:10px}}
+
+/* Search and filter controls for library and collection archive */
+.filter-tools{display:grid;grid-template-columns:minmax(120px,1.5fr) minmax(105px,1fr) minmax(105px,1fr);gap:7px;margin:12px 0}
+.filter-tools input,.filter-tools select{box-sizing:border-box;width:100%;min-width:0;padding:10px 11px;border:1px solid #e8e1e8;border-radius:9px;background:#fff;color:#51465a;font:inherit;font-size:11px;outline:none}
+.filter-tools input:focus,.filter-tools select:focus{border-color:#b9a8c2;box-shadow:0 0 0 2px #f2edf4}
+.book-filter-tools{grid-template-columns:minmax(130px,1.5fr) minmax(90px,1fr) minmax(90px,1fr)}
+.filter-empty{padding:10px 4px;font-size:11px}
+@media(max-width:600px){.filter-tools,.book-filter-tools{grid-template-columns:1fr 1fr}.filter-tools input,.book-filter-tools input{grid-column:1/-1}}
