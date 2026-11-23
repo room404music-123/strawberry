@@ -156,3 +156,19 @@
 .stream-modal .stream-song-main{min-width:0}
 .stream-modal .stream-song-main small{overflow-wrap:anywhere}
 @media(max-width:600px){.stream-modal-backdrop{padding:0;align-items:stretch}.stream-modal{width:100%;max-height:100dvh;border-radius:0;padding:15px 13px calc(18px + env(safe-area-inset-bottom))}.stream-modal .stream-list{max-height:none;overflow:visible}.stream-modal .stream-platform{padding:10px}.stream-modal .stream-item{grid-template-columns:minmax(0,1fr) auto}}
+
+/* Unified music library and per-track chart detail */
+.music-library-panel .song-chart{margin-top:16px;padding-top:16px;border-top:1px solid #eee8e5}
+.library-song-list{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.library-song{display:flex;align-items:center;gap:12px;width:100%;padding:12px 13px;text-align:left;border:1px solid #eee9e7;border-radius:10px;background:#fff;color:inherit;cursor:pointer;transition:background .15s,border-color .15s}
+.library-song:hover{background:#faf7fb;border-color:#d9cfdf}
+.library-song-index{display:grid;place-items:center;width:30px;height:30px;flex:none;border-radius:8px;background:#f3eff4;color:#897a91;font-size:10px;font-weight:700}
+.library-song-info{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.library-song-info b{font-size:12px;overflow-wrap:anywhere}
+.library-song-info small{font-size:9px;color:#999}
+.library-song-arrow{font-size:22px;color:#aaa}
+.album-library-song{background:#fcfbfa}
+.chart-detail-head{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}
+.chart-detail-head .chart-modes{margin:0}
+.chart-detail-title{margin:8px 0 14px;font-size:17px;color:#51465a}
+@media(max-width:600px){.chart-detail-head{align-items:stretch;flex-direction:column}.chart-detail-head .chart-modes{display:flex}.chart-detail-head .chart-modes button{flex:1}.library-song{padding:10px}}
