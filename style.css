@@ -57,3 +57,19 @@
 #albumModal .album-pick-info>.album-pick-used{color:#b18a9a;font-weight:700}
 
 .chart-modes{display:flex;gap:8px;margin:12px 0}.chart-modes button{flex:0 1 auto}.chart-modes button.active{background:#e8edf3;color:#536a82;border:1px solid #cbd7e3}
+
+/* Streaming distribution */
+.stream-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;margin:14px 0}
+.stream-summary>div{background:#f7f5f2;border-radius:9px;padding:11px;min-width:0}
+.stream-summary small,.stream-summary b{display:block}
+.stream-summary small{font-size:8px;color:#999}
+.stream-summary b{font-size:16px;margin-top:5px;overflow-wrap:anywhere}
+.stream-list{display:grid;gap:7px;margin:10px 0 17px}
+.stream-item{display:flex;justify-content:space-between;align-items:center;gap:10px;border:1px solid #eeeae8;border-radius:9px;padding:10px}
+.stream-item>div{min-width:0}
+.stream-item b,.stream-item small{display:block;overflow-wrap:anywhere}
+.stream-item b{font-size:10px}
+.stream-item small{font-size:9px;color:#999;margin-top:4px}
+.stream-item button{flex:0 0 auto}
+.stream-state{font-size:9px;color:#7e9a88;white-space:nowrap}
+@media(max-width:600px){.stream-summary{grid-template-columns:1fr 1fr}.stream-summary>div:last-child{grid-column:span 2}.stream-item{align-items:flex-start;flex-direction:column}.stream-item button{width:100%}}
