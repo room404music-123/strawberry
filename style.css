@@ -142,3 +142,17 @@
 .stream-song-picker-head small{font-size:8px;color:#999}
 .stream-bulk-row{justify-content:flex-start;flex-wrap:wrap}
 .stream-bulk-row .muted{font-size:8px}
+
+/* Full-screen streaming song picker */
+.stream-modal-backdrop{position:fixed;inset:0;z-index:1000;background:rgba(30,25,34,.58);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;padding:18px}
+.stream-modal{width:min(900px,100%);max-height:min(90vh,900px);overflow-y:auto;overscroll-behavior:contain;background:#fbfaf9;border:1px solid #e8e1e9;border-radius:18px;padding:18px;box-shadow:0 24px 80px #17121f45}
+.stream-modal-top{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.stream-modal-top small{font-size:8px;letter-spacing:.16em;color:#9b8ba2}
+.stream-modal-top h3{font-size:17px;margin:3px 0 0;color:#51465a}
+.stream-modal-close{width:36px;height:36px;border:1px solid #e7e0e8;border-radius:50%;background:#fff;font-size:24px;color:#716879;cursor:pointer;flex:none}
+.stream-modal .stream-platform{margin-top:0}
+.stream-modal .stream-list{max-height:42vh;overflow-y:auto;padding-right:4px;overscroll-behavior:contain}
+.stream-modal .stream-item{grid-template-columns:minmax(0,1fr) auto}
+.stream-modal .stream-song-main{min-width:0}
+.stream-modal .stream-song-main small{overflow-wrap:anywhere}
+@media(max-width:600px){.stream-modal-backdrop{padding:0;align-items:stretch}.stream-modal{width:100%;max-height:100dvh;border-radius:0;padding:15px 13px calc(18px + env(safe-area-inset-bottom))}.stream-modal .stream-list{max-height:none;overflow:visible}.stream-modal .stream-platform{padding:10px}.stream-modal .stream-item{grid-template-columns:minmax(0,1fr) auto}}
