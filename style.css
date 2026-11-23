@@ -46,3 +46,12 @@
  #albumModal{padding:10px;place-items:start center}
  #albumModal .album-modal{max-height:calc(100dvh - 20px);padding:22px 18px}
 }
+
+/* Album picker: show each single's type and chart standing */
+#albumModal .album-pick{align-items:flex-start;padding:11px 12px;gap:10px}
+#albumModal .album-pick input{margin-top:4px;flex:0 0 auto}
+#albumModal .album-pick-info{display:flex;flex-direction:column;gap:4px;min-width:0}
+#albumModal .album-pick-info>b{font-size:12px;overflow-wrap:anywhere}
+#albumModal .album-pick-info>small{font-size:9px;line-height:1.5;color:#999}
+#albumModal .album-pick-info>.album-pick-meta{color:#7d8791}
+#albumModal .album-pick-info>.album-pick-used{color:#b18a9a;font-weight:700}
