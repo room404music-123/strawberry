@@ -32,7 +32,7 @@ function stopStudyTimer(){if(studyInterval){clearInterval(studyInterval);studyIn
 function save(){localStorage.setItem(KEY,JSON.stringify(s));$("saved").textContent="保存済み · "+new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
 function log(m){s.logs.unshift({at:now(),m});s.logs=s.logs.slice(0,35)}
 function initBgm(){if(bgmAudio)return bgmAudio;bgmAudio=new Audio("assets/Paperback_Solitude.mp3");bgmAudio.loop=true;bgmAudio.preload="auto";bgmAudio.volume=Math.max(0,Math.min(1,bgmVolume/100));bgmAudio.addEventListener("error",()=>{const el=$("bgmStatus");if(el)el.textContent="BGMファイルをassets/Paperback_Solitude.mp3に追加してください";});return bgmAudio}
-function effectiveBgmVolume(){return Math.max(0,Math.min(1,bgmVolume/100*.25))}
+function effectiveBgmVolume(){return Math.max(0,Math.min(1,bgmVolume/100*.05))}
 function updateBgmUI(){const b=$("bgmToggle"),v=$("bgmVolume"),sv=$("sfxVolume");if(b){b.textContent=bgmEnabled?"ON":"OFF";b.classList.toggle("active",bgmEnabled)}if(v)v.value=String(bgmVolume);if(sv)sv.value=String(sfxVolume)}
 async function startBgm(){if(!bgmEnabled||document.hidden)return;const a=initBgm();a.volume=effectiveBgmVolume();try{await a.play();const el=$("bgmStatus");if(el)el.textContent="Paperback Solitude · 再生中"}catch(e){const el=$("bgmStatus");if(el)el.textContent="画面を一度タップするとBGMが再生されます"}}
 function stopBgm(){if(bgmAudio)bgmAudio.pause()}
