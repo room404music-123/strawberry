@@ -93,3 +93,10 @@
 .stream-albums .stream-item{margin-top:7px}
 .stream-platform .stream-state{white-space:nowrap}
 @media(max-width:600px){.stream-platform{padding:10px}.stream-platform-head{flex-direction:column}.stream-platform-stats{display:grid;grid-template-columns:1fr 1fr}.stream-bulk-row{align-items:flex-start;flex-direction:column}.stream-bulk-row button{width:100%}}
+
+.stream-service-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:14px 0}
+.stream-service-card{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;border:1px solid #e9e5e1;border-radius:10px;background:#fff;padding:11px;min-width:0;color:inherit;cursor:pointer}
+.stream-service-card b{font-size:11px}
+.stream-service-card small{font-size:9px;color:#999;line-height:1.45}
+.stream-service-card.selected{border:2px solid #8a7897;background:#f8f5fa;padding:10px}
+@media(min-width:700px){.stream-service-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
