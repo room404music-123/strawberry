@@ -35,3 +35,14 @@
 .idol-study .study-avatar:before{top:-44px;left:30%;width:40%;height:56px;border-radius:50%}
 .idol-study .study-avatar:after{display:none}.study-person b{font-size:14px;margin-top:14px}.study-person small{font-size:8px;letter-spacing:.16em;color:#999;margin-top:4px}.study-person>span{position:absolute;top:8%;right:12%;font-size:24px;color:#91a9bd}.idol-study>span{color:#c58ca4}.study-center{text-align:center}.study-center small{font-size:9px;letter-spacing:.2em;color:#a0a0aa}.study-center h2{font-size:clamp(19px,3vw,30px);margin:12px 0}.study-center p{font-size:11px;color:#8d8994;line-height:1.8}.study-countdown{text-align:center;margin:10px auto 20px}.study-countdown small{display:block;font-size:10px;color:#8e8994;letter-spacing:.15em}.study-countdown strong{display:block;font-size:clamp(42px,9vw,76px);font-variant-numeric:tabular-nums;letter-spacing:.04em;font-weight:600;margin-top:4px}.study-screen-controls{display:flex;gap:10px;justify-content:center;width:min(420px,100%);margin:0 auto}.study-screen-controls button{flex:1}.study-screen.landscape .study-scene{grid-template-columns:1fr 1fr 1fr;max-width:1200px}.study-screen.landscape .study-person{min-height:180px}.study-screen.landscape .study-avatar{height:clamp(105px,25vh,170px);width:clamp(45px,6vw,76px)}.study-screen.landscape .study-countdown{margin:0 auto 10px}.study-screen.landscape{background:linear-gradient(115deg,#e9eff5,#f2e7ed)}
 @media(max-width:600px){.study-scene{grid-template-columns:1fr 1fr;gap:4px;min-height:0;padding:22px 0}.study-center{grid-column:1/-1;grid-row:1}.study-person{min-height:170px}.study-avatar{height:130px;width:62px}.study-person>span{right:18%}.study-countdown{margin:5px auto 15px}.study-screen-controls{flex-direction:column}.study-screen-controls button{flex:auto}.study-screen.landscape .study-scene{grid-template-columns:1fr 1fr 1fr;gap:4px}.study-screen.landscape .study-center{grid-column:auto;grid-row:auto}.study-screen.landscape .study-person{min-height:110px}.study-screen.landscape .study-avatar{height:90px;width:45px}.study-screen.landscape .study-countdown strong{font-size:42px}}
+
+
+/* Album picker: scroll the whole modal to reach every track */
+#albumModal{display:grid;place-items:start center;overflow-y:auto;overscroll-behavior:contain;padding:18px}
+#albumModal .album-modal{width:min(520px,100%);max-height:calc(100dvh - 36px);overflow-y:auto;overscroll-behavior:contain;min-height:0}
+#albumModal .album-singles{max-height:none;overflow:visible;margin:10px 0 16px}
+#albumModal .album-pick{min-height:48px}
+@media(max-width:600px){
+ #albumModal{padding:10px;place-items:start center}
+ #albumModal .album-modal{max-height:calc(100dvh - 20px);padding:22px 18px}
+}
