@@ -1,8 +1,8 @@
 (()=> {
 const KEY="one-more-hit-v1",$=id=>document.getElementById(id),now=()=>Date.now(),yen=n=>"¥"+Math.floor(n).toLocaleString("ja-JP");
 const GAME_DAY_MS=12000;
-let sfxEnabled=localStorage.getItem(KEY+"-sfx")!=="off",audioCtx=null;
-let bgmEnabled=localStorage.getItem(KEY+"-bgm")!=="off",bgmVolume=Number(localStorage.getItem(KEY+"-bgm-volume")||35),bgmAudio=null;
+let sfxEnabled=localStorage.getItem(KEY+"-sfx")!=="off",sfxVolume=Number(localStorage.getItem(KEY+"-sfx-volume")??65),audioCtx=null;
+let bgmEnabled=localStorage.getItem(KEY+"-bgm")!=="off",bgmVolume=Number(localStorage.getItem(KEY+"-bgm-volume")??35),bgmAudio=null,bgmWasPlayingBeforeHide=false;
 const beginButton=document.getElementById("begin");
 if(beginButton)beginButton.addEventListener("click",()=>{
  try{
@@ -32,10 +32,11 @@ function stopStudyTimer(){if(studyInterval){clearInterval(studyInterval);studyIn
 function save(){localStorage.setItem(KEY,JSON.stringify(s));$("saved").textContent="保存済み · "+new Date().toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})}
 function log(m){s.logs.unshift({at:now(),m});s.logs=s.logs.slice(0,35)}
 function initBgm(){if(bgmAudio)return bgmAudio;bgmAudio=new Audio("assets/Paperback_Solitude.mp3");bgmAudio.loop=true;bgmAudio.preload="auto";bgmAudio.volume=Math.max(0,Math.min(1,bgmVolume/100));bgmAudio.addEventListener("error",()=>{const el=$("bgmStatus");if(el)el.textContent="BGMファイルをassets/Paperback_Solitude.mp3に追加してください";});return bgmAudio}
-function updateBgmUI(){const b=$("bgmToggle"),v=$("bgmVolume");if(b){b.textContent=bgmEnabled?"ON":"OFF";b.classList.toggle("active",bgmEnabled)}if(v)v.value=String(bgmVolume)}
-async function startBgm(){if(!bgmEnabled)return;const a=initBgm();a.volume=Math.max(0,Math.min(1,bgmVolume/100));try{await a.play();const el=$("bgmStatus");if(el)el.textContent="Paperback Solitude · 再生中"}catch(e){const el=$("bgmStatus");if(el)el.textContent="画面を一度タップするとBGMが再生されます"}}
+function effectiveBgmVolume(){return Math.max(0,Math.min(1,bgmVolume/100*.25))}
+function updateBgmUI(){const b=$("bgmToggle"),v=$("bgmVolume"),sv=$("sfxVolume");if(b){b.textContent=bgmEnabled?"ON":"OFF";b.classList.toggle("active",bgmEnabled)}if(v)v.value=String(bgmVolume);if(sv)sv.value=String(sfxVolume)}
+async function startBgm(){if(!bgmEnabled||document.hidden)return;const a=initBgm();a.volume=effectiveBgmVolume();try{await a.play();const el=$("bgmStatus");if(el)el.textContent="Paperback Solitude · 再生中"}catch(e){const el=$("bgmStatus");if(el)el.textContent="画面を一度タップするとBGMが再生されます"}}
 function stopBgm(){if(bgmAudio)bgmAudio.pause()}
-function playSfx(kind="click"){if(!sfxEnabled)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioCtx)audioCtx=new AC();if(audioCtx.state==="suspended")audioCtx.resume();const t=audioCtx.currentTime,notes=kind==="success"?[660,880]:kind==="discover"?[523,659,784]:kind==="error"?[220,165]:[kind==="primary"?440:330];notes.forEach((freq,i)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type=kind==="discover"?"sine":"triangle";osc.frequency.setValueAtTime(freq,t+i*.075);gain.gain.setValueAtTime(.0001,t+i*.075);gain.gain.exponentialRampToValueAtTime(kind==="discover"?.11:.065,t+i*.075+.012);gain.gain.exponentialRampToValueAtTime(.0001,t+i*.075+.14);osc.connect(gain);gain.connect(audioCtx.destination);osc.start(t+i*.075);osc.stop(t+i*.075+.15)})}catch(e){}}
+function playSfx(kind="click"){if(!sfxEnabled||sfxVolume<=0)return;try{const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return;if(!audioCtx)audioCtx=new AC();if(audioCtx.state==="suspended")audioCtx.resume();const t=audioCtx.currentTime,notes=kind==="success"?[660,880]:kind==="discover"?[523,659,784]:kind==="error"?[220,165]:[kind==="primary"?440:330],scale=sfxVolume/100;notes.forEach((freq,i)=>{const osc=audioCtx.createOscillator(),gain=audioCtx.createGain();osc.type=kind==="discover"?"sine":"triangle";osc.frequency.setValueAtTime(freq,t+i*.075);gain.gain.setValueAtTime(.0001,t+i*.075);gain.gain.exponentialRampToValueAtTime((kind==="discover"?.11:.065)*scale,t+i*.075+.012);gain.gain.exponentialRampToValueAtTime(.0001,t+i*.075+.14);osc.connect(gain);gain.connect(audioCtx.destination);osc.start(t+i*.075);osc.stop(t+i*.075+.15)})}catch(e){}}
 function say(m){$("toast").textContent=m;$("toast").classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>$("toast").classList.remove("show"),2300)}
 function spend(n){if(s.money<n){say("資金が足りないみたい。リリースやライブで増やそう。");return false}s.money-=n;return true}
 function cCooldown(){let r=0;for(const [id,v] of [["meal",.05],["bed",.05],["desk",.08],["pc",.12]])if(s.cOwned.includes(id))r+=v;return Math.max(5000,30000*(1-r))}
@@ -99,7 +100,7 @@ $("inbox").innerHTML=s.inbox.length?s.inbox.map(x=>'<div class="song"><div class
 let rel=s.songs.filter(x=>x.released);$("library").innerHTML=rel.length?rel.map(x=>'<div class="song"><div class="cover">♫</div><div class="songmeta"><b>'+x.title+'</b><small>'+x.genre+' · 品質 '+x.quality+' · '+x.fans+' fans</small></div><b>'+yen(x.chartEarned||0)+'</b></div>').join(""):'<div class="emptybox">まだ楽曲はありません。</div>';$("logs").innerHTML=s.logs.length?s.logs.slice(0,14).map(x=>'<div class="log"><time>'+new Date(x.at).toLocaleTimeString("ja-JP",{hour:"2-digit",minute:"2-digit"})+'</time>'+x.m+'</div>').join(""):'<p class="muted">ここに二人の活動が記録されます。</p>';$("today").textContent=new Date().toLocaleDateString("ja-JP",{month:"long",day:"numeric",weekday:"short"})+" · 活動中";document.querySelectorAll(".view").forEach(x=>x.classList.toggle("hidden",x.id!==view+"View"))}
 function officePageTo(page){officePage=page;$("officeMainPage").classList.toggle("hidden",page!=="main");$("officeBookPage").classList.toggle("hidden",page!=="book");document.querySelectorAll("[data-office-page]").forEach(b=>b.classList.toggle("active",b.dataset.officePage===page))}
  function viewTo(v){view=v;document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("active",b.dataset.view===v));if(v==="office")officePageTo(officePage);render()}
-function renderSfxSetting(){const b=$("sfxToggle");if(b){b.textContent=sfxEnabled?"ON":"OFF";b.classList.toggle("active",sfxEnabled)}}$("sfxToggle").onclick=()=>{sfxEnabled=!sfxEnabled;localStorage.setItem(KEY+"-sfx",sfxEnabled?"on":"off");renderSfxSetting();if(sfxEnabled)playSfx("success")};renderSfxSetting();$("bgmToggle").onclick=()=>{bgmEnabled=!bgmEnabled;localStorage.setItem(KEY+"-bgm",bgmEnabled?"on":"off");updateBgmUI();if(bgmEnabled)startBgm();else stopBgm()};$("bgmVolume").oninput=e=>{bgmVolume=Number(e.target.value);localStorage.setItem(KEY+"-bgm-volume",String(bgmVolume));if(bgmAudio)bgmAudio.volume=bgmVolume/100};updateBgmUI();document.addEventListener("pointerdown",()=>{if(bgmEnabled)startBgm()},{once:true});document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled||b.id==="sfxToggle")return;const kind=b.id==="reset"?"error":b.id==="combineBtn"?"discover":b.id==="startC"?"primary":b.classList.contains("primary")?"success":"click";playSfx(kind)} ,true);
+function renderSfxSetting(){const b=$("sfxToggle");if(b){b.textContent=sfxEnabled?"ON":"OFF";b.classList.toggle("active",sfxEnabled)}}$("sfxToggle").onclick=()=>{sfxEnabled=!sfxEnabled;localStorage.setItem(KEY+"-sfx",sfxEnabled?"on":"off");renderSfxSetting();if(sfxEnabled)playSfx("success")};renderSfxSetting();$("bgmToggle").onclick=()=>{bgmEnabled=!bgmEnabled;localStorage.setItem(KEY+"-bgm",bgmEnabled?"on":"off");updateBgmUI();if(bgmEnabled)startBgm();else stopBgm()};$("bgmVolume").oninput=e=>{bgmVolume=Number(e.target.value);localStorage.setItem(KEY+"-bgm-volume",String(bgmVolume));if(bgmAudio)bgmAudio.volume=effectiveBgmVolume()};$("sfxVolume").oninput=e=>{sfxVolume=Number(e.target.value);localStorage.setItem(KEY+"-sfx-volume",String(sfxVolume));};updateBgmUI();document.addEventListener("pointerdown",()=>{if(bgmEnabled)startBgm()},{once:true});document.addEventListener("click",e=>{const b=e.target.closest("button");if(!b||b.disabled||b.id==="sfxToggle")return;const kind=b.id==="reset"?"error":b.id==="combineBtn"?"discover":b.id==="startC"?"primary":b.classList.contains("primary")?"success":"click";playSfx(kind)} ,true);
 document.querySelectorAll("[data-study-time]").forEach(b=>b.onclick=()=>{stopStudyTimer();studySeconds=Number(b.dataset.studyTime);renderStudyTimer()});$("studyStart").onclick=()=>{if(studyRunning){stopStudyTimer();return}if(studySeconds<=0)studySeconds=1500;studyRunning=true;renderStudyTimer();studyInterval=setInterval(()=>{studySeconds=Math.max(0,studySeconds-1);if(studySeconds===0){stopStudyTimer();say("勉強タイマー終了！おつかれさま。")}else renderStudyTimer()},1000)};$("studyReset").onclick=()=>{stopStudyTimer();studySeconds=1500;renderStudyTimer()};renderStudyTimer();
 $("startC").onclick=compose;$("releaseRandomTitle").onclick=()=>{let song=s.songs.find(x=>x.id===pendingReleaseId);if(song)$("releaseTitleInput").value=randomTitle(song.genre)};$("confirmReleaseTitle").onclick=finishRelease;$("cancelReleaseTitle").onclick=()=>{$("releaseTitleModal").classList.add("hidden");pendingReleaseId=null};$("cLocation").onchange=()=>{s.cLocation=$("cLocation").value;log("作曲家の外出先を「"+s.cLocation+"」に変更。");save();say(s.cLocation+"でインスピレーションを探すよ。")};$("closeBookDetail").onclick=()=>$("bookDetailModal").classList.add("hidden");
 
@@ -149,12 +150,16 @@ let hiddenSnapshot=null,hiddenAt=0;
 setInterval(tick,5000);
 document.addEventListener("visibilitychange",()=>{
  if(document.hidden){
+  bgmWasPlayingBeforeHide=!!(bgmAudio&&!bgmAudio.paused);
+  stopBgm();
   if(!$("returnModal").classList.contains("hidden"))return;
   tick();
   hiddenSnapshot=snapshot();hiddenAt=now();
   localStorage.setItem(KEY+"-base",JSON.stringify(hiddenSnapshot));
   s.lastSeen=hiddenAt;save();
  }else{
+  if(bgmWasPlayingBeforeHide&&bgmEnabled)startBgm();
+  bgmWasPlayingBeforeHide=false;
   const elapsed=hiddenAt?now()-hiddenAt:0;
   tick();
   if(hiddenSnapshot&&elapsed>=60000)showReturnSummary(hiddenSnapshot,elapsed);
@@ -166,4 +171,5 @@ document.addEventListener("visibilitychange",()=>{
 const catchUpAfterResume=()=>{if(document.hidden)return;tick();s.lastSeen=now();save()};
 window.addEventListener("focus",catchUpAfterResume);
 window.addEventListener("pageshow",catchUpAfterResume);
+window.addEventListener("pagehide",()=>{bgmWasPlayingBeforeHide=!!(bgmAudio&&!bgmAudio.paused);stopBgm()});
 })();
