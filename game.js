@@ -102,7 +102,7 @@ function renderBook(){
   const filtered=pool.filter(x=>{const found=owned.includes(x[0]),q=f.search.trim().toLowerCase();if(f.state==="found"&&!found||f.state==="locked"&&found)return false;if(f.category!=="all"&&x[2]!==f.category)return false;if(q&&!(found&&(x[1]+" "+x[2]+" "+x[3].join(" ")+" "+x[4]).toLowerCase().includes(q))&&!("？？？？").includes(q))return false;return true});
   $(target).innerHTML=controls+(filtered.length?filtered.map(x=>{let found=owned.includes(x[0]);return '<button class="book-item '+(found?"found":"locked")+'" data-book="'+type+":"+x[0]+'"><b>'+(found?x[1]:"？？？？")+"</b><small>"+(found?x[2]:"未発見")+"</small></button>"}).join(""):'<p class="muted filter-empty">条件に一致する図鑑アイテムはありません。</p>');
   $(target).querySelectorAll("[data-book]").forEach(btn=>btn.onclick=()=>{let [t,id]=btn.dataset.book.split(":");if((t==="c"?s.cOwned:s.iOwned).includes(id))openBookDetail(t,id);else say("まだ発見していないアイテムだよ。")});
-  $(target).querySelector('[data-book-search]').oninput=e=>{bookFilters[type].search=e.target.value;renderBook()};
+  $(target).querySelector('[data-book-search]').oninput=e=>{const pos=e.target.selectionStart;bookFilters[type].search=e.target.value;renderBook();const input=$(target).querySelector('[data-book-search]');input.focus();input.setSelectionRange(pos,pos)};
   $(target).querySelector('[data-book-category]').onchange=e=>{bookFilters[type].category=e.target.value;renderBook()};
   $(target).querySelector('[data-book-state]').onchange=e=>{bookFilters[type].state=e.target.value;renderBook()};
  }
@@ -201,7 +201,7 @@ function renderLibrary(){
  const filteredAlbums=albums.filter(a=>(!q||(a.title+" "+(a.concept||"")).toLowerCase().includes(q))&&(libraryKind==="all"||libraryKind==="albums")&&(libraryGenre==="all"||libraryGenre==="all"));
  $("library").innerHTML=controls+(filtered.length?'<div class="library-song-list">'+filtered.map((x,i)=>'<button class="library-song" data-open-song="'+x.id+'"><span class="library-song-index">'+String(i+1).padStart(2,"0")+'</span><span class="library-song-info"><b>'+x.title+'</b><small>'+x.genre+' · 品質 '+x.quality+' · '+x.fans+' fans</small></span><span class="library-song-arrow">›</span></button>').join("")+'</div>':'<p class="muted filter-empty">条件に一致する楽曲はありません。</p>');
  $("albumLibrary").innerHTML=filteredAlbums.length?'<h4>リリース済みアルバム</h4><div class="library-song-list">'+filteredAlbums.map(a=>'<button class="library-song album-library-song" data-open-album="'+a.id+'"><span class="library-song-index">▤</span><span class="library-song-info"><b>'+a.title+'</b><small>'+a.concept+' · '+a.trackIds.length+'曲収録 · '+(a.sales||0).toLocaleString("ja-JP")+' 枚</small></span><span class="library-song-arrow">›</span></button>').join("")+'</div>':(libraryKind==="single"||libraryKind==="album"?"":'<p class="muted filter-empty">条件に一致するアルバムはありません。</p>');
- $("librarySearch").oninput=e=>{librarySearch=e.target.value;renderLibrary()};
+ $("librarySearch").oninput=e=>{const pos=e.target.selectionStart;librarySearch=e.target.value;renderLibrary();const input=$("librarySearch");input.focus();input.setSelectionRange(pos,pos)};
  $("libraryGenre").onchange=e=>{libraryGenre=e.target.value;renderLibrary()};
  $("libraryKind").onchange=e=>{libraryKind=e.target.value;renderLibrary()};
  $("library").querySelectorAll("[data-open-song]").forEach(btn=>btn.onclick=()=>{s.chartSelected=btn.dataset.openSong;chartMode="songs";chartDetailOpen=true;save();renderChart();$("songChart").scrollIntoView({behavior:"smooth",block:"start"})});
