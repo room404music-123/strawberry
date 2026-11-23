@@ -100,3 +100,34 @@
 .stream-service-card small{font-size:9px;color:#999;line-height:1.45}
 .stream-service-card.selected{border:2px solid #8a7897;background:#f8f5fa;padding:10px}
 @media(min-width:700px){.stream-service-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
+
+
+/* Compact streaming dashboard + refined service picker */
+.stream-summary{grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin:10px 0}
+.stream-summary>div{padding:8px 9px;border-radius:8px}
+.stream-summary small{font-size:7px;letter-spacing:.02em}
+.stream-summary b{font-size:13px;margin-top:3px}
+.stream-platforms{gap:9px;margin-top:9px}
+.stream-service-grid{grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:10px 0 12px}
+.stream-service-card{position:relative;min-height:62px;justify-content:center;gap:3px;padding:8px 9px 8px 11px;border:1px solid #ece8e6;border-radius:9px;background:linear-gradient(145deg,#fff 0%,#fbfaf9 100%);transition:border-color .16s,background .16s,box-shadow .16s,transform .16s}
+.stream-service-card:before{content:"";position:absolute;left:0;top:9px;bottom:9px;width:3px;border-radius:0 4px 4px 0;background:#e8e2e8}
+.stream-service-card b{font-size:10px;line-height:1.35;letter-spacing:.01em}
+.stream-service-card small{font-size:8px;line-height:1.35;color:#96919a}
+.stream-service-card.selected{border:1px solid #a99ab4;background:linear-gradient(135deg,#f8f4fa,#f2f4f8);padding:8px 9px 8px 11px;box-shadow:0 2px 8px #57466310}
+.stream-service-card.selected:before{background:#917da0}
+.stream-service-card:active{transform:translateY(1px)}
+.stream-platform{padding:11px;border-radius:10px}
+.stream-platform-head h4{font-size:12px}
+.stream-platform-head p{font-size:8px;margin-top:2px}
+.stream-platform-stats{gap:5px 11px;margin-top:7px;font-size:8px}
+.stream-platform-totals{gap:6px 10px;padding:7px;margin-top:7px;font-size:8px}
+.stream-bulk-row{margin-top:8px}
+.stream-list{margin-top:7px}
+.stream-item{padding:8px 9px;margin-top:6px}
+.stream-song-main small{font-size:8px}
+.stream-select{font-size:9px}
+.stream-platform .small{padding:7px 9px;font-size:8px}
+.stream-albums{margin-top:10px}
+.stream-albums>b{font-size:9px}
+@media(max-width:760px){.stream-service-grid{grid-template-columns:repeat(3,minmax(0,1fr))}.stream-summary{grid-template-columns:repeat(3,minmax(0,1fr))}.stream-summary>div{padding:8px}}
+@media(max-width:520px){.stream-service-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.stream-service-card{min-height:58px}.stream-summary{grid-template-columns:repeat(2,minmax(0,1fr))}.stream-summary>div:last-child{grid-column:auto}.stream-platform-head{flex-direction:row;align-items:center}.stream-platform-stats{grid-template-columns:1fr 1fr;display:grid}.stream-item{gap:7px}.stream-song-main small{overflow-wrap:anywhere}}
